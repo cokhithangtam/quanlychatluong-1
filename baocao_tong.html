@@ -613,7 +613,7 @@
                 </div>
 
                 <!-- Summary Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div class="bg-green-100 p-4 rounded-lg">
                         <h4 class="text-green-800 font-semibold">Tổng hàng nhận</h4>
                         <p class="text-2xl font-bold text-green-600" id="totalReceiveHN">0</p>
@@ -625,10 +625,6 @@
                     <div class="bg-purple-100 p-4 rounded-lg">
                         <h4 class="text-purple-800 font-semibold">Ngày cao nhất</h4>
                         <p class="text-lg font-bold text-purple-600" id="maxDayHN">-</p>
-                    </div>
-                    <div class="bg-orange-100 p-4 rounded-lg">
-                        <h4 class="text-orange-800 font-semibold">Tăng trưởng</h4>
-                        <p class="text-2xl font-bold text-orange-600" id="growthHN">0%</p>
                     </div>
                 </div>
 
@@ -711,7 +707,7 @@
                 </div>
 
                 <!-- Summary Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div class="bg-orange-100 p-4 rounded-lg">
                         <h4 class="text-orange-800 font-semibold">Tổng hàng giao</h4>
                         <p class="text-2xl font-bold text-orange-600" id="totalDeliveryHG">0</p>
@@ -723,10 +719,6 @@
                     <div class="bg-purple-100 p-4 rounded-lg">
                         <h4 class="text-purple-800 font-semibold">Ngày cao nhất</h4>
                         <p class="text-lg font-bold text-purple-600" id="maxDayHG">-</p>
-                    </div>
-                    <div class="bg-green-100 p-4 rounded-lg">
-                        <h4 class="text-green-800 font-semibold">Tăng trưởng</h4>
-                        <p class="text-2xl font-bold text-green-600" id="growthHG">0%</p>
                     </div>
                 </div>
 
@@ -1302,9 +1294,10 @@
                             if (!isMatch) return false;
                         }
                     } else if (field === 'position' && filters.position) {
-                        if (!item.noi_phat_sinh_loi || !item.noi_phat_sinh_loi.includes(value)) {
-                            return false;
-                        }
+                        if (value === 'Phôi' && parseInt(item.sl_phoi_loi || 0) <= 0) return false;
+                        if (value === 'PKY' && parseInt(item.sl_pky_loi || 0) <= 0) return false;
+                        if (value === 'PSX' && parseInt(item.sl_psx_loi || 0) <= 0) return false;
+                        if (value === 'PKT' && parseInt(item.sl_pkt_loi || 0) <= 0) return false;
                     } else if (item[field] !== undefined && item[field] != value) {
                         return false;
                     }
@@ -2733,7 +2726,7 @@
                 }
             };
 
-            // Đếm lỗi theo từng vị trí - CHIA ĐỀU CHO CÁC VỊ TRÍ
+            // Đếm lỗi theo từng vị trí dựa trên các cột số lượng
             const positionCounts = {
                 'Phôi': 0,
                 'PKY': 0,
@@ -2748,30 +2741,15 @@
                 const errorCount = parseInt(item.sl_loi || 0);
                 totalActualErrors += errorCount;
 
-                if (item.noi_phat_sinh_loi) {
-                    const positionString = item.noi_phat_sinh_loi.toString();
+                const slPhoi = parseInt(item.sl_phoi_loi || 0);
+                const slPky = parseInt(item.sl_pky_loi || 0);
+                const slPsx = parseInt(item.sl_psx_loi || 0);
+                const slPkt = parseInt(item.sl_pkt_loi || 0);
 
-                    // Tìm tất cả vị trí hợp lệ trong bản ghi này
-                    const validPositions = [];
-
-                    predefinedPositions.forEach(pos => {
-                        if (positionString.includes(pos)) {
-                            validPositions.push(pos);
-                        }
-                    });
-
-                    // CHIA ĐỀU SỐ LƯỢNG LỖI CHO CÁC VỊ TRÍ HỢP LỆ
-                    if (validPositions.length > 0) {
-                        const errorPerPosition = errorCount / validPositions.length;
-
-                        validPositions.forEach(position => {
-                            positionCounts[position] += errorPerPosition;
-                        });
-
-                        // Debug log để kiểm tra
-                        console.log(`Mã lỗi: ${item.ma_loi}, SL: ${errorCount}, Vị trí: [${validPositions.join(', ')}], Chia mỗi vị trí: ${errorPerPosition}`);
-                    }
-                }
+                positionCounts['Phôi'] += slPhoi;
+                positionCounts['PKY'] += slPky;
+                positionCounts['PSX'] += slPsx;
+                positionCounts['PKT'] += slPkt;
             });
 
             processedData.summary.totalErrors = totalActualErrors;
@@ -2866,12 +2844,10 @@
                 }
                 errorCounts[errorCode].count += errorCount;
 
-                if (item.noi_phat_sinh_loi) {
-                    const positions = item.noi_phat_sinh_loi.toString().split(',').map(p => p.trim());
-                    positions.forEach(pos => {
-                        errorCounts[errorCode].positions.add(pos);
-                    });
-                }
+                if (parseInt(item.sl_phoi_loi || 0) > 0) errorCounts[errorCode].positions.add('Phôi');
+                if (parseInt(item.sl_pky_loi || 0) > 0) errorCounts[errorCode].positions.add('PKY');
+                if (parseInt(item.sl_psx_loi || 0) > 0) errorCounts[errorCode].positions.add('PSX');
+                if (parseInt(item.sl_pkt_loi || 0) > 0) errorCounts[errorCode].positions.add('PKT');
 
                 if (item.noi_xu_ly_loi) {
                     const handlers = item.noi_xu_ly_loi.toString().split(',').map(h => h.trim());
@@ -3034,9 +3010,8 @@
                                     const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                     const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
                                     return [
-                                        'Số lỗi phân bổ: ' + context.raw,
-                                        'Tỷ lệ: ' + percentage + '%',
-                                        '(Đã chia đều cho các vị trí chung)'
+                                        'Số lỗi: ' + context.raw,
+                                        'Tỷ lệ: ' + percentage + '%'
                                     ];
                                 }
                             }
@@ -3058,6 +3033,8 @@
 
                         data.labels.forEach((label, index) => {
                             const value = data.datasets[0].data[index];
+                            if (value <= 0) return; // Chỉ vẽ nhãn cho các phần có dữ liệu
+
                             const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
 
                             // Tính góc cho mỗi segment
@@ -3711,10 +3688,6 @@
             document.getElementById('totalReceiveHN').textContent = data.summary.totalReceive.toLocaleString();
             document.getElementById('avgDailyHN').textContent = data.summary.avgDaily.toLocaleString();
             document.getElementById('maxDayHN').textContent = data.summary.maxDay;
-
-            const growthElement = document.getElementById('growthHN');
-            growthElement.textContent = (data.summary.growth >= 0 ? '+' : '') + data.summary.growth + '%';
-            growthElement.className = data.summary.growth >= 0 ? 'text-2xl font-bold text-green-600' : 'text-2xl font-bold text-red-600';
         }
 
         function updateReceiveChart(data) {
@@ -4106,10 +4079,6 @@
             document.getElementById('totalDeliveryHG').textContent = data.summary.totalDelivery.toLocaleString();
             document.getElementById('avgDailyHG').textContent = data.summary.avgDaily.toLocaleString();
             document.getElementById('maxDayHG').textContent = data.summary.maxDay;
-
-            const growthElement = document.getElementById('growthHG');
-            growthElement.textContent = (data.summary.growth >= 0 ? '+' : '') + data.summary.growth + '%';
-            growthElement.className = data.summary.growth >= 0 ? 'text-2xl font-bold text-green-600' : 'text-2xl font-bold text-red-600';
         }
 
         function updateDeliveryChart(data) {
