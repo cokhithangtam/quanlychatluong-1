@@ -3,7 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phiếu Theo Dõi Tình Trạng Sản Phẩm</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -13,18 +17,16 @@
     <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            background-color: #f8f9fa;
-        }
+        /* ============================================
+           PHẦN IN ẤN (PRINT) - GIỮ NGUYÊN
+           ============================================ */
 
-        .container {
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
+        /* Print form styles - giữ nguyên Times New Roman */
+        #printArea,
+        #printArea * {
+            font-family: 'Times New Roman', Times, serif;
         }
 
         .containerin {
@@ -34,11 +36,6 @@
             background-color: white;
             border-radius: 10px;
             padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
         }
 
         .title {
@@ -95,29 +92,28 @@
             flex-grow: 1;
         }
 
-        table {
+        /* Print form table styles */
+        #printArea table {
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
+            font-family: 'Times New Roman', Times, serif;
         }
 
-        th {
+        #printArea th {
             border: 1px solid black;
             padding: 6px;
             text-align: center;
+            background-color: #f0f0f0;
+            color: blue;
+            font-weight: bold;
         }
 
-        td {
+        #printArea td {
             border: 1px solid black;
             padding: 6px;
             text-align: center;
             height: 30px;
-        }
-
-        th {
-            background-color: #f0f0f0;
-            color: blue;
-            font-weight: bold;
         }
 
         .double-column {
@@ -144,62 +140,6 @@
             text-align: center;
         }
 
-        /* CSS đơn giản cho loading indicator */
-        .loading {
-            text-align: center;
-            padding: 5px;
-            font-size: 16px;
-            display: none;
-            position: relative;
-        }
-
-        .loading:before {
-            content: "";
-            width: 25px;
-            height: 25px;
-            border: 3px solid #6e8efb;
-            border-top-color: #a777e3;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: inline-block;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .error {
-            color: red;
-            text-align: center;
-            margin: 20px;
-            font-size: 16px;
-            display: none;
-        }
-
-        /* Bảng dữ liệu */
-        #dataTable th,
-        #dataTable td {
-            text-align: center;
-            vertical-align: middle;
-            padding: 10px;
-        }
-
-        #printSelectedBtn {
-            font-size: 1.1em;
-            padding: 10px 20px;
-        }
-
-        #selectAll,
-        .row-checkbox {
-            width: 20px;
-            height: 20px;
-            transform: scale(1.2);
-        }
-
         /* CSS cho in ấn */
         @media print {
             body * {
@@ -221,11 +161,35 @@
                 width: 100%;
             }
 
+            /* Trang bản vẽ - mặt sau */
+            .drawing-page {
+                page-break-after: always;
+                width: 100%;
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+            }
+
+            .drawing-page iframe {
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+
+            .drawing-page img {
+                width: 100%;
+                height: 100%;
+                object-fit: fill;
+            }
+
             .page-break {
                 page-break-after: always;
             }
 
-            /* Ẩn các phần không cần thiết khi in */
             #dataTableSection,
             #printSelectedBtn,
             .loading,
@@ -233,7 +197,6 @@
                 display: none !important;
             }
 
-            /* Loại bỏ padding và margin cho container khi in */
             .containerin {
                 padding: 0 !important;
                 margin: 0 !important;
@@ -242,210 +205,13 @@
                 border-radius: 0 !important;
             }
 
-            /* Loại bỏ padding và margin cho các phần tử bên trong */
             .top-labels,
             .info-section,
             table {
                 margin: 0 !important;
                 padding: 0 !important;
             }
-        }
 
-        /* Thiết kế mềm mại và hiện đại cho bảng dữ liệu */
-        #dataTable {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            border-collapse: separate;
-            border-spacing: 0;
-            width: 100%;
-            border: none;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            margin: 25px 0;
-        }
-
-        #dataTable th {
-            color: white;
-            font-weight: 500;
-            padding: 16px 20px;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            border: none;
-        }
-
-        #dataTable td {
-            padding: 14px 20px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            color: #555;
-            font-size: 14px;
-        }
-
-        #dataTable tbody tr {
-            transition: all 0.2s ease;
-        }
-
-        #dataTable tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        #dataTable tbody tr:hover {
-            background-color: rgba(110, 142, 251, 0.05);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-        }
-
-        #dataTable.table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(249, 250, 253, 0.7);
-        }
-
-        #dataTable input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            border-radius: 4px;
-            border: 2px solid #ddd;
-            appearance: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s;
-        }
-
-        #dataTable input[type="checkbox"]:checked {
-            background-color: #a777e3;
-            border-color: #a777e3;
-        }
-
-        #dataTable input[type="checkbox"]:checked:after {
-            content: '✓';
-            color: white;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 12px;
-        }
-
-        .table-responsive {
-            border-radius: 12px;
-            overflow: hidden;
-            padding: 0;
-            margin-bottom: 30px;
-        }
-
-        /* Chỉnh sửa để loại bỏ style mặc định của Bootstrap nếu cần */
-        #dataTable.table-bordered th,
-        #dataTable.table-bordered td {
-            border: none;
-        }
-
-        /* Đảm bảo display: none không bị ghi đè */
-        #dataTable[style*="display: none"] {
-            display: none !important;
-        }
-
-        .fixed-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            z-index: 1000;
-            padding-left: 30px;
-            padding-right: 30px;
-        }
-
-        .table-header {
-            background: white;
-        }
-
-        .table-content {
-            margin-top: 150px;
-            /* Điều chỉnh theo chiều cao thực tế của header */
-        }
-
-        #headerTable {
-            margin-bottom: 0;
-        }
-
-        #headerTable thead tr {
-            background: linear-gradient(45deg, #6e8efb, #a777e3);
-            border-radius: 8px;
-        }
-
-        #headerTable thead th {
-            color: white !important;
-            border-color: rgba(255, 255, 255, 0.2) !important;
-            font-weight: 500;
-        }
-
-        /* Thêm border-radius cho góc trái và phải */
-        #headerTable thead th:first-child {
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-        }
-
-        #headerTable thead th:last-child {
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
-        }
-
-        .fixed-header h1 {
-            color: #1976D2;
-            font-size: 34px;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        #printSelectedBtn {
-            background: #1976D2;
-            border: none;
-            padding: 10px 25px;
-            font-weight: 500;
-            border-radius: 5px;
-            transition: all 0.3s ease;
-        }
-
-        #printSelectedBtn:hover {
-            background: #1565C0;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        #selectAll {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        /* Điều chỉnh container chính */
-        #mainContainer {
-            padding-top: 20px;
-            max-width: 100%;
-            margin: 0 auto;
-            padding-left: 30px;
-            padding-right: 30px;
-        }
-
-        /* Style cho loading indicator */
-        .loading {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: 500;
-            color: #1976D2;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Đảm bảo các cột có độ rộng phù hợp */
-        #headerTable th,
-        #dataTable th {
-            white-space: nowrap;
-        }
-
-        /* Media query cho màn hình in */
-        @media print {
             .fixed-header {
                 position: static;
                 box-shadow: none;
@@ -457,6 +223,605 @@
             }
         }
 
+        /* ============================================
+           PHẦN GIAO DIỆN WEB - REDESIGN MỚI
+           ============================================ */
+
+        /* === ROOT & DESIGN TOKENS === */
+        :root {
+            --bg-primary: #f0f2f8;
+            --bg-secondary: #e8eaf0;
+            --bg-card: rgba(255, 255, 255, 0.7);
+            --bg-glass: rgba(255, 255, 255, 0.55);
+            --bg-glass-hover: rgba(110, 142, 251, 0.07);
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a68;
+            --text-muted: #8e8ea0;
+            --accent-1: #6e8efb;
+            --accent-2: #a777e3;
+            --accent-3: #0288d1;
+            --gradient-main: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+            --gradient-subtle: linear-gradient(135deg, rgba(110, 142, 251, 0.1) 0%, rgba(167, 119, 227, 0.1) 100%);
+            --border-color: rgba(0, 0, 0, 0.08);
+            --border-active: rgba(110, 142, 251, 0.5);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.1);
+            --shadow-glow: 0 0 20px rgba(110, 142, 251, 0.12);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* === GLOBAL === */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Animated background mesh */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 20%, rgba(110, 142, 251, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(167, 119, 227, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(79, 195, 247, 0.06) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+            animation: bgPulse 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes bgPulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* === CONTAINER === */
+        .container {
+            position: relative;
+            z-index: 1;
+            margin: 0 auto;
+            background-color: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* === FIXED HEADER — GLASSMORPHISM === */
+        .fixed-header {
+            flex-shrink: 0;
+            z-index: 1000;
+            padding: 16px 32px 12px;
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(24px) saturate(1.8);
+            -webkit-backdrop-filter: blur(24px) saturate(1.8);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .fixed-header h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 14px;
+            background: var(--gradient-main);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+
+        /* === LOADING INDICATOR === */
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 24px;
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--accent-1);
+            margin-bottom: 12px;
+        }
+
+        .loading:before {
+            content: "";
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(110, 142, 251, 0.2);
+            border-top-color: var(--accent-1);
+            border-right-color: var(--accent-2);
+            border-radius: 50%;
+            animation: spinGlow 0.8s linear infinite;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        @keyframes spinGlow {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #e53935;
+            text-align: center;
+            margin: 16px 0;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            display: none;
+            padding: 12px 20px;
+            background: rgba(229, 57, 53, 0.06);
+            border: 1px solid rgba(229, 57, 53, 0.15);
+            border-radius: var(--radius-md);
+        }
+
+        /* === MULTI-SEARCH BAR === */
+        .multi-search-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            transition: border-color var(--transition-smooth);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .multi-search-container:focus-within {
+            border-color: var(--border-active);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .multi-search-container label {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        #multiSearchInput {
+            flex: 1;
+            min-width: 280px;
+            padding: 10px 16px;
+            background: white;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--text-primary);
+            outline: none;
+            transition: all var(--transition-smooth);
+        }
+
+        #multiSearchInput::placeholder {
+            color: var(--text-muted);
+        }
+
+        #multiSearchInput:focus {
+            border-color: var(--accent-1);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.1);
+        }
+
+        /* === BUTTONS === */
+        .btn-gradient {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #autoCheckBtn {
+            background: var(--gradient-main);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(110, 142, 251, 0.2);
+        }
+
+        #autoCheckBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(110, 142, 251, 0.35);
+        }
+
+        #autoCheckBtn:active {
+            transform: translateY(0);
+        }
+
+        #clearSearchBtn {
+            background: rgba(229, 57, 53, 0.08);
+            color: #e53935;
+            border: 1px solid rgba(229, 57, 53, 0.2);
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            white-space: nowrap;
+        }
+
+        #clearSearchBtn:hover {
+            background: rgba(229, 57, 53, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(229, 57, 53, 0.12);
+        }
+
+        #clearSearchBtn:active {
+            transform: translateY(0);
+        }
+
+        .search-result-info {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-left: 4px;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+        }
+
+        /* === ACTION BAR === */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        #printSelectedBtn {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 12px 28px;
+            background: var(--gradient-main);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: white;
+            cursor: pointer;
+            transition: all var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(110, 142, 251, 0.25);
+            letter-spacing: 0.3px;
+        }
+
+        #printSelectedBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(110, 142, 251, 0.4);
+        }
+
+        #printSelectedBtn:active {
+            transform: translateY(-1px);
+        }
+
+        .action-bar .dataTables_length {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .action-bar .dataTables_length label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .action-bar .dataTables_length select {
+            padding: 6px 10px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color var(--transition-fast);
+        }
+
+        .action-bar .dataTables_length select:focus {
+            border-color: var(--accent-1);
+            outline: none;
+        }
+
+        /* === TABLE CONTENT === */
+        .table-content {
+            flex: 1;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            margin-top: 0;
+            padding: 0 32px;
+            min-height: 0;
+        }
+
+        /* === DATA TABLE === */
+        #dataTable {
+            font-family: 'Inter', sans-serif;
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            table-layout: fixed;
+            border: none;
+            border-radius: var(--radius-md);
+            box-shadow: none;
+            margin: 0;
+            background: transparent;
+        }
+
+        /* === DATA TABLE THEAD (STICKY) === */
+        #dataTable thead {
+            position: sticky;
+            top: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        #dataTable thead tr {
+            background: var(--gradient-main);
+        }
+
+        #dataTable thead th {
+            font-family: 'Inter', sans-serif;
+            color: white !important;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            padding: 14px 16px;
+            border: none !important;
+            border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
+            text-align: center;
+        }
+
+        #dataTable thead th:last-child {
+            border-right: none !important;
+        }
+
+        /* Checkbox in header */
+        #selectAll {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+            background: transparent;
+            position: relative;
+            transition: all var(--transition-fast);
+        }
+
+        #selectAll:checked {
+            background: white;
+            border-color: white;
+        }
+
+        #selectAll:checked::after {
+            content: '✓';
+            color: var(--accent-1);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        #dataTable td {
+            padding: 14px 16px;
+            border: none;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 400;
+            transition: all var(--transition-fast);
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        #dataTable tbody tr {
+            background: white;
+            transition: all var(--transition-smooth);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+
+        #dataTable tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        #dataTable tbody tr:hover {
+            background: rgba(110, 142, 251, 0.06) !important;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #dataTable tbody tr:hover td {
+            color: var(--text-primary);
+        }
+
+        #dataTable.table-striped tbody tr:nth-of-type(odd) {
+            background-color: white;
+        }
+
+        /* Highlight matching rows */
+        #dataTable tbody tr.search-highlight {
+            background-color: rgba(110, 142, 251, 0.1) !important;
+            border-left: 3px solid var(--accent-1);
+        }
+
+        /* === CUSTOM CHECKBOXES IN TABLE === */
+        #dataTable input[type="checkbox"],
+        .row-checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 2px solid rgba(0, 0, 0, 0.18);
+            background: white;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition-bounce);
+            transform: scale(1);
+        }
+
+        #dataTable input[type="checkbox"]:hover,
+        .row-checkbox:hover {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 8px rgba(110, 142, 251, 0.2);
+        }
+
+        #dataTable input[type="checkbox"]:checked,
+        .row-checkbox:checked {
+            background: var(--gradient-main);
+            border-color: transparent;
+            animation: checkBounce 0.3s ease;
+        }
+
+        @keyframes checkBounce {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        #dataTable input[type="checkbox"]:checked::after,
+        .row-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Quick print button in table */
+        #dataTable td button,
+        #dataTable td [onclick*="quickPrint"] {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        #dataTable td button:hover,
+        #dataTable td [onclick*="quickPrint"]:hover {
+            background: rgba(110, 142, 251, 0.08);
+            transform: scale(1.15);
+        }
+
+        /* Links in table */
+        #dataTable td a {
+            color: #e53935 !important;
+            text-decoration: none !important;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+            padding: 4px 10px;
+            border-radius: 4px;
+            background: rgba(229, 57, 53, 0.06);
+        }
+
+        #dataTable td a:hover {
+            background: rgba(229, 57, 53, 0.12);
+            box-shadow: 0 0 8px rgba(229, 57, 53, 0.08);
+        }
+
+        /* === TABLE RESPONSIVE === */
+        .table-responsive {
+            border-radius: 0;
+            overflow: visible;
+            padding: 0;
+            margin-bottom: 0;
+            background: transparent;
+        }
+
+        /* DataTables wrapper trong vùng cuộn */
+        .table-content .dataTables_wrapper {
+            padding-bottom: 20px;
+        }
+
+        /* === DATATABLES BOOTSTRAP OVERRIDES === */
+        #dataTable.table-bordered th,
+        #dataTable.table-bordered td {
+            border-top: none;
+            border-left: none;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid transparent;
+        }
+
+        #dataTable[style*="display: none"] {
+            display: none !important;
+        }
+
+        /* === CONTAINER === */
+        #mainContainer {
+            position: relative;
+            z-index: 1;
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* === DATATABLES CONTROLS === */
         .top {
             display: flex;
             align-items: center;
@@ -472,20 +837,21 @@
             margin-left: auto;
         }
 
-        /* Điều chỉnh khoảng cách giữa các phần tử */
         .dataTables_length label,
         .dataTables_filter label {
             margin: 0;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-secondary);
+            font-size: 13px;
         }
 
         .dataTables_filter input {
             margin-left: 8px;
         }
 
-        /* Định dạng container cho controls */
         .dataTables_wrapper .top {
             display: flex;
             align-items: center;
@@ -494,7 +860,6 @@
             padding: 10px 0;
         }
 
-        /* Định dạng phần select entries */
         .dataTables_length {
             display: flex;
             align-items: center;
@@ -510,12 +875,14 @@
         }
 
         .dataTables_length select {
-            padding: 4px 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 6px 10px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
         }
 
-        /* Định dạng phần search */
         .dataTables_filter {
             display: flex;
             align-items: center;
@@ -531,15 +898,85 @@
         }
 
         .dataTables_filter input {
-            padding: 4px 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 6px 10px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
             min-width: 200px;
+            font-family: 'Inter', sans-serif;
         }
 
-        /* Đặt controls vào fixed header */
-        .fixed-header .table-header {
-            margin-top: 15px;
+
+        /* === PAGINATION === */
+        .dataTables_wrapper .dataTables_paginate {
+            padding: 16px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 14px;
+            margin: 0 3px;
+            border-radius: var(--radius-sm) !important;
+            border: 1px solid var(--border-color) !important;
+            background: white !important;
+            color: var(--text-secondary) !important;
+            transition: all var(--transition-fast);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: rgba(110, 142, 251, 0.06) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--accent-1) !important;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--gradient-main) !important;
+            color: white !important;
+            border: none !important;
+            box-shadow: 0 4px 12px rgba(110, 142, 251, 0.3);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: var(--text-muted);
+            padding: 12px 0;
+        }
+
+        /* === SCROLLBAR === */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.12);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* === SELECTION === */
+        ::selection {
+            background: rgba(110, 142, 251, 0.2);
+            color: var(--text-primary);
         }
     </style>
 </head>
@@ -547,30 +984,41 @@
 <body>
     <div class="container" id="mainContainer">
         <div class="fixed-header">
-            <h1 class="text-center my-2"><Strong>DANH SÁCH PHIẾU THEO DÕI SẢN PHẨM</Strong></h1>
+            <h1 class="text-center my-2">DANH SÁCH PHIẾU THEO DÕI SẢN PHẨM</h1>
             <div id="loadingIndicator" class="loading">Đang tải dữ liệu...</div>
             <div id="errorMessage" class="error"></div>
-            <button id="printSelectedBtn" class="btn btn-success mb-1" style="display: none;">In phiếu</button>
-            <div class="table-header">
-                <table id="headerTable" class="table table-striped table-bordered"
-                    style="width:100%; margin-bottom: 0;">
-                    <thead>
-                        <tr>
-                            <th width="10%"><input type="checkbox" id="selectAll"></th>
-                            <th width="15%">File bản vẽ</th>
-                            <th width="10%">STT</th>
-                            <th width="25%">Order KD</th>
-                            <th width="25%">Tên chi tiết</th>
-                            <th width="15%">Số lượng</th>
-                        </tr>
-                    </thead>
-                </table>
+
+            <!-- Multi-search bar -->
+            <div class="multi-search-container" id="multiSearchSection" style="display: none;">
+                <label for="multiSearchInput">🔍 Tìm kiếm:</label>
+                <input type="text" id="multiSearchInput"
+                    placeholder="Nhập nhiều Order KD cách nhau bằng dấu phẩy, ví dụ: KD001, KD002, KD003">
+                <button id="autoCheckBtn" title="Tích checkbox tất cả kết quả tìm được">✅ Tích tất cả kết quả</button>
+                <button id="clearSearchBtn" title="Xóa tìm kiếm và bỏ tích tất cả">🗑️ Xóa</button>
+                <span class="search-result-info" id="searchResultInfo"></span>
             </div>
+
+            <div class="action-bar" id="actionBar" style="display: none;">
+                <button id="printSelectedBtn">🖨️ In phiếu</button>
+                <div id="lengthControlPlaceholder"></div>
+            </div>
+
         </div>
 
         <div id="dataTableSection" class="table-responsive table-content">
             <table id="dataTable" class="table table-striped table-bordered" style="width:100%; display: none;">
-                <!-- Xóa toàn bộ phần thead bị ẩn -->
+                <thead>
+                    <tr>
+                        <th width="5%"></th>
+                        <th width="8%" style="text-align:center"><input type="checkbox" id="selectAll"></th>
+                        <th width="12%">File bản vẽ</th>
+                        <th width="10%">STT</th>
+                        <th width="25%">Order KD</th>
+                        <th width="25%">Tên chi tiết</th>
+                        <th width="12%">Số lượng</th>
+                        <th width="10%">Ghi chú</th>
+                    </tr>
+                </thead>
                 <tbody id="tableBody">
                     <!-- Dữ liệu sẽ được thêm vào đây bằng JavaScript -->
                 </tbody>
@@ -602,6 +1050,18 @@
             }
         };
 
+        // Glassmorphism header scroll shadow
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.fixed-header');
+            if (header) {
+                if (window.scrollY > 10) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            }
+        });
+
         // Constants for AppSheet connection
         const appId = 'e1339939-5987-4d7a-8c73-436348abf6b7';
         const accessKey = 'V2-WTcys-x7QFl-Z5SzF-zSe7D-qciuV-yaUHk-CDGEe-oSexL';
@@ -614,6 +1074,88 @@
         let allOrderData = [];
         let dataTable;
         const productCache = {}; // Cache cho dữ liệu sản phẩm
+        const quang3DCache = {}; // Cache cho dữ liệu đo 3D quang
+        const giaoHangPSXCache = {}; // Cache cho dữ liệu giao hàng PSX
+        let orderDataMap = new Map(); // Map để lookup nhanh theo order_kd
+        let printStatusMap = {}; // Trạng thái in: { order_kd: true/false }
+
+        // API endpoint cho trạng thái in (dùng Vercel API hoặc localStorage fallback)
+        const printStatusApiBase = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+            ? '' : '';
+
+        // Tải trạng thái in từ API
+        async function loadPrintStatus() {
+            try {
+                const response = await fetch('/api/print-status');
+                if (response.ok) {
+                    const data = await response.json();
+                    printStatusMap = data || {};
+                }
+            } catch (e) {
+                // Fallback: đọc từ localStorage
+                try {
+                    printStatusMap = JSON.parse(localStorage.getItem('printStatus') || '{}');
+                } catch (err) { printStatusMap = {}; }
+            }
+        }
+
+        // Đánh dấu đã in và cập nhật UI
+        async function markAsPrinted(orderIds) {
+            orderIds.forEach(id => { printStatusMap[id] = true; });
+
+            // Cập nhật UI ngay lập tức
+            orderIds.forEach(id => {
+                const cell = document.querySelector(`[data-order-status="${id}"]`);
+                if (cell) {
+                    cell.textContent = 'Đã in';
+                    cell.style.color = '#2e7d32';
+                }
+            });
+
+            // Lưu lên server
+            try {
+                await fetch('/api/print-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderIds: orderIds })
+                });
+            } catch (e) {
+                // Fallback: lưu localStorage
+                localStorage.setItem('printStatus', JSON.stringify(printStatusMap));
+            }
+        }
+
+        // Tự động đồng bộ trạng thái in từ MongoDB mỗi 10 giây
+        async function refreshPrintStatus() {
+            try {
+                const response = await fetch('/api/print-status');
+                if (response.ok) {
+                    const newData = await response.json();
+                    // So sánh và cập nhật UI cho các order thay đổi
+                    for (const orderId in newData) {
+                        if (orderId === '__initialized') continue;
+                        if (!printStatusMap[orderId] && newData[orderId]) {
+                            // Order mới được in từ PC khác → cập nhật UI
+                            printStatusMap[orderId] = true;
+                            const cells = document.querySelectorAll(`[data-order-status="${orderId}"]`);
+                            cells.forEach(cell => {
+                                cell.textContent = 'Đã in';
+                                cell.style.color = '#2e7d32';
+                                cell.style.fontWeight = '600';
+                            });
+                        }
+                    }
+                }
+            } catch (e) { /* Bỏ qua lỗi mạng */ }
+        }
+
+        // Bắt đầu polling mỗi 10 giây
+        setInterval(refreshPrintStatus, 10000);
+
+        // Promise toàn cục để đảm bảo dữ liệu nền đã tải xong trước khi in
+        let productsReadyPromise = Promise.resolve();
+        let quang3DReadyPromise = Promise.resolve();
+        let psxReadyPromise = Promise.resolve();
 
         // Fetch dữ liệu đơn hàng
         async function fetchBatchedOrders() {
@@ -638,12 +1180,7 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const text = await response.text();
-                if (!text || text.trim() === '') {
-                    return [];
-                }
-
-                const data = JSON.parse(text);
+                const data = await response.json();
                 if (!Array.isArray(data)) {
                     return [];
                 }
@@ -651,20 +1188,16 @@
                 // Lọc dữ liệu hợp lệ (có order_kd và ten_chi_tiet)
                 const filteredData = data.filter(item => item.order_kd && item.ten_chi_tiet);
 
-                // Sắp xếp theo _RowNumber giảm dần (nếu có)
-                const sortedData = [...filteredData].sort((a, b) => {
-                    // Kiểm tra xem dữ liệu có _RowNumber không
+                // Sắp xếp theo _RowNumber giảm dần (in-place, không tạo mảng mới)
+                filteredData.sort((a, b) => {
                     if (a._RowNumber !== undefined && b._RowNumber !== undefined) {
-                        return b._RowNumber - a._RowNumber; // Sắp xếp giảm dần
+                        return b._RowNumber - a._RowNumber;
                     }
-                    // Fallback nếu không có _RowNumber
                     return 0;
                 });
 
-                console.log("Dữ liệu sau khi sắp xếp theo _RowNumber:",
-                    sortedData.map(item => `${item._RowNumber || 'N/A'} - ${item.order_kd}`));
-
-                return sortedData;
+                console.log(`Đã tải ${filteredData.length} đơn hàng`);
+                return filteredData;
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu đơn hàng:', error);
                 throw error;
@@ -680,8 +1213,22 @@
             data.forEach((item, index) => {
                 const row = tableBody.insertRow();
 
+                // Nút In nhanh
+                const cellQuickPrint = row.insertCell(0);
+                cellQuickPrint.style.textAlign = 'center';
+                const printBtn = document.createElement('button');
+                printBtn.textContent = '🖨️';
+                printBtn.title = 'In nhanh';
+                printBtn.style.cssText = 'border:none; background:none; cursor:pointer; font-size:18px; padding:0;';
+                printBtn.setAttribute('data-order', item.order_kd);
+                printBtn.addEventListener('click', function () {
+                    quickPrint(this.getAttribute('data-order'));
+                });
+                cellQuickPrint.appendChild(printBtn);
+
                 // Checkbox
-                const cellCheckbox = row.insertCell(0);
+                const cellCheckbox = row.insertCell(1);
+                cellCheckbox.style.textAlign = 'center';
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'row-checkbox';
@@ -689,14 +1236,14 @@
                 cellCheckbox.appendChild(checkbox);
 
                 // THAY ĐỔI: Lấy file_ban_ve từ dữ liệu sản phẩm
-                const cellTinhChat = row.insertCell(1);
+                const cellTinhChat = row.insertCell(2);
                 const productData = productCache[item.ten_chi_tiet];
                 if (productData && productData.file_ban_ve) {
                     const fileLink = document.createElement('a');
                     fileLink.textContent = "In bản vẽ";
                     const fileName = encodeURIComponent(productData.file_ban_ve);
                     fileLink.href = `https://www.appsheet.com/template/gettablefileurl?appName=Quảnlýchấtlượng-648353741&tableName=san_pham&fileName=${fileName}`;
-                    fileLink.style.color = "blue";
+                    fileLink.style.color = "red";
                     fileLink.style.textDecoration = "underline";
                     fileLink.style.cursor = "pointer";
                     fileLink.addEventListener('click', function (e) {
@@ -709,20 +1256,29 @@
                 }
 
                 // STT - Đánh số từ 1 trở đi
-                const cellSTT = row.insertCell(2);
+                const cellSTT = row.insertCell(3);
                 cellSTT.textContent = index + 1;
 
                 // Các cột khác như trước đây...
-                const cellOrder = row.insertCell(3);
+                const cellOrder = row.insertCell(4);
                 cellOrder.textContent = item.order_kd;
 
-                const cellTenChiTiet = row.insertCell(4);
+                const cellTenChiTiet = row.insertCell(5);
                 cellTenChiTiet.textContent = item.ten_chi_tiet;
 
-                const cellSoLuong = row.insertCell(5);
+                const cellSoLuong = row.insertCell(6);
                 cellSoLuong.textContent = item.sll;
 
-                
+                // Cột Ghi chú (Đã in / Chưa in)
+                const cellGhiChu = row.insertCell(7);
+                const isPrinted = printStatusMap[item.order_kd];
+                cellGhiChu.textContent = isPrinted ? 'Đã in' : 'Chưa in';
+                cellGhiChu.style.textAlign = 'center';
+                cellGhiChu.style.fontWeight = '600';
+                cellGhiChu.style.color = isPrinted ? '#2e7d32' : '#e65100';
+                cellGhiChu.setAttribute('data-order-status', item.order_kd);
+
+
             });
 
             // Hủy DataTable cũ nếu đã tồn tại
@@ -741,8 +1297,26 @@
                 pageLength: 25,
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tất cả"]],
                 data: data,
-                dom: '<"top"lf>rt<"bottom"ip>', // Thêm 'f' để giữ chức năng tìm kiếm
+                dom: 'rt<"bottom"ip>', // Bỏ 'l' và 'f' vì đã có multi-search và action-bar tùy chỉnh
+                columnDefs: [
+                    { width: '5%', targets: 0 },
+                    { width: '8%', targets: 1 },
+                    { width: '12%', targets: 2 },
+                    { width: '10%', targets: 3 },
+                    { width: '25%', targets: 4 },
+                    { width: '25%', targets: 5 },
+                    { width: '12%', targets: 6 },
+                    { width: '10%', targets: 7 }
+                ],
+                autoWidth: false,
                 columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        render: function (data, type, row) {
+                            return '<button onclick="quickPrint(\'' + row.order_kd + '\')" title="In nhanh" style="border:none; background:none; cursor:pointer; font-size:18px; padding:2px 6px;">🖨️</button>';
+                        }
+                    },
                     {
                         data: null,
                         render: function (data, type, row) {
@@ -757,7 +1331,7 @@
                             if (productData && productData.file_ban_ve) {
                                 return '<a href="https://www.appsheet.com/template/gettablefileurl?appName=Quảnlýchấtlượng-648353741&tableName=san_pham&fileName='
                                     + encodeURIComponent(productData.file_ban_ve)
-                                    + '" style="color: blue; text-decoration: underline; cursor: pointer;" onclick="window.open(this.href, \'_blank\'); return false;">In bản vẽ</a>';
+                                    + '" style="color: red; text-decoration: underline; cursor: pointer;" onclick="window.open(this.href, \'_blank\'); return false;">In bản vẽ</a>';
                             }
                             return '';
                         }
@@ -770,16 +1344,38 @@
                     },
                     { data: 'order_kd' },
                     { data: 'ten_chi_tiet' },
-                    { data: 'sll' }
-                    
+                    { data: 'sll' },
+                    {
+                        data: null,
+                        orderable: false,
+                        render: function (data, type, row) {
+                            const isPrinted = printStatusMap[row.order_kd];
+                            const text = isPrinted ? 'Đã in' : 'Chưa in';
+                            const color = isPrinted ? '#2e7d32' : '#e65100';
+                            return '<span data-order-status="' + row.order_kd + '" style="font-weight:600; color:' + color + '">' + text + '</span>';
+                        }
+                    }
+
                 ],
                 headerCallback: function (thead, data, start, end, display) {
-                    $(thead).closest('thead').hide(); // Ẩn hoàn toàn thead
+                    // Thead hiện, dùng sticky
                 }
             });
 
+            // Hiển thị multi-search section và action bar
+            document.getElementById('multiSearchSection').style.display = 'flex';
+            document.getElementById('actionBar').style.display = 'flex';
+
+            // Thiết lập multi-search
+            setupMultiSearch();
+
             document.getElementById('dataTable').style.display = 'table';
-            document.getElementById('printSelectedBtn').style.display = 'inline-block';
+
+            // Di chuyển length control vào cạnh nút In phiếu
+            moveLengthControl();
+
+            // Tự động tính lại margin-top cho table-content
+            adjustTableContentMargin();
         }
 
         // Function to fetch product data from san_pham table
@@ -838,6 +1434,10 @@
             form.className = 'containerin page-break';
             form.style.pageBreakAfter = 'always';
             form.style.marginBottom = '20px';
+            // Lưu thông tin bản vẽ vào form để dùng khi in
+            if (productData && productData.file_ban_ve) {
+                form.setAttribute('data-file-ban-ve', productData.file_ban_ve);
+            }
 
             // Xử lý thông tin cơ bản
             let tapRen = '';
@@ -984,13 +1584,13 @@
                    <p style="font-weight: bold;" id="note6"></p>
                    <p style="font-weight: bold;" id="note7"></p>
                    <p style="font-weight: bold;" id="note8"></p>
+                   <p style="font-weight: bold;" id="note9"></p>
+                   <p style="font-weight: bold; color: red;" id="note10"></p>
                </div>
            `;
 
-            // Xử lý các ghi chú sau khi tạo form
-            if (productData) {
-                processNotes(form, productData, orderData);
-            }
+            // Xử lý các ghi chú sau khi tạo form (luôn gọi để kiểm tra 3D quang)
+            processNotes(form, productData, orderData);
 
             return form;
         }
@@ -1001,13 +1601,13 @@
             const so_file = orderData.so_file || '';
             const order_kd = orderData.order_kd || '';
 
-            // Sử dụng dữ liệu từ sản phẩm
-            const vat_lieu = productData.vat_lieu || '';
-            const mat_ngoai = productData.mat_ngoai || '';
-            const sp_de_bien_dang = productData.sp_de_bien_dang || '';
-            const mail_xn_bv = productData.mail_xn_bv || '';
-            const gc_bang_tay = productData.gc_bang_tay || '';
-            const sp_dong_dang = productData.sp_dong_dang || '';
+            // Sử dụng dữ liệu từ sản phẩm (có thể null)
+            const vat_lieu = productData?.vat_lieu || '';
+            const mat_ngoai = productData?.mat_ngoai || '';
+            const sp_de_bien_dang = productData?.sp_de_bien_dang || '';
+            const mail_xn_bv = productData?.mail_xn_bv || '';
+            const gc_bang_tay = productData?.gc_bang_tay || '';
+            const sp_dong_dang = productData?.sp_dong_dang || '';
 
             // Note 1
             let note1 = '';
@@ -1094,14 +1694,267 @@
                 note8 = "GÓI: phải kiểm soát SẢN PHẨM ĐỒNG DẠNG trước khi gói hàng => XN thực hiện:";
             }
             formElement.querySelector('#note8').textContent = note8;
+
+            // Note 9 - Kiểm tra chương trình đo máy 3D quang
+            let note9 = '';
+            if (quang3DCache[ten_chi_tiet]) {
+                note9 = 'KTRA: Chi tiết đã có chương trình đo máy 3D quang => XN thực hiện:';
+            }
+            formElement.querySelector('#note9').textContent = note9;
+
+            // Note 10 - Thông tin xác nhận giao hàng PSX
+            let note10 = '';
+            const giaoHangData = giaoHangPSXCache[order_kd];
+            if (giaoHangData && Array.isArray(giaoHangData)) {
+                const parts = giaoHangData.map(item =>
+                    `* PSX đã có xác nhận: ${item.sl_da_xac_nhan_khi_giao_hang} sản phẩm ${item.noi_dung_da_xac_nhan_khi_giao_hang}`
+                );
+                note10 = parts.join(' | ');
+            }
+            formElement.querySelector('#note10').textContent = note10;
         }
 
-        // Tối ưu hóa in phiếu
+        // Cache ảnh bản vẽ đã render (tránh render lại)
+        const renderedDrawingCache = {};
+
+        // Tạo trang bản vẽ (mặt sau) cho in 2 mặt
+        async function createDrawingPage(fileBanVe) {
+            // Kiểm tra cache trước
+            if (renderedDrawingCache[fileBanVe]) {
+                const page = document.createElement('div');
+                page.className = 'drawing-page';
+                page.style.pageBreakAfter = 'always';
+                const img = document.createElement('img');
+                img.src = renderedDrawingCache[fileBanVe];
+                img.style.cssText = 'width:100%; height:100%; object-fit:contain;';
+                page.appendChild(img);
+                return page;
+            }
+
+            const drawingUrl = `https://www.appsheet.com/template/gettablefileurl?appName=Quảnlýchấtlượng-648353741&tableName=san_pham&fileName=${encodeURIComponent(fileBanVe)}`;
+            // Chọn proxy phù hợp theo môi trường
+            const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+            const isVercel = location.hostname.includes('vercel.app') || location.hostname.includes('.vercel.');
+            let fetchUrl;
+            if (isLocal) {
+                fetchUrl = `/proxy?url=${encodeURIComponent(drawingUrl)}`;
+            } else if (isVercel || location.pathname === '/sogiaonhan.html') {
+                // Vercel hoặc bất kỳ host nào có /api/proxy
+                fetchUrl = `/api/proxy?url=${encodeURIComponent(drawingUrl)}`;
+            } else {
+                fetchUrl = `https://corsproxy.io/?${encodeURIComponent(drawingUrl)}`;
+            }
+            const page = document.createElement('div');
+            page.className = 'drawing-page';
+            page.style.pageBreakAfter = 'always';
+
+            const ext = fileBanVe.split('.').pop().toLowerCase();
+
+            if (ext === 'pdf') {
+                try {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                    const response = await fetch(fetchUrl);
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    const arrayBuffer = await response.arrayBuffer();
+                    
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    const pdfPage = await pdf.getPage(1);
+                    
+                    // Scale 4 = 288 DPI (nhanh hơn 2x so với scale 6, chất lượng vẫn tốt)
+                    const scale = 4;
+                    const viewport = pdfPage.getViewport({ scale });
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    await pdfPage.render({ canvasContext: ctx, viewport }).promise;
+                    
+                    // Xoay 90° nếu dọc
+                    let finalCanvas = canvas;
+                    if (canvas.height > canvas.width) {
+                        const rc = document.createElement('canvas');
+                        rc.width = canvas.height;
+                        rc.height = canvas.width;
+                        const rCtx = rc.getContext('2d');
+                        rCtx.translate(rc.width / 2, rc.height / 2);
+                        rCtx.rotate(90 * Math.PI / 180);
+                        rCtx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
+                        finalCanvas = rc;
+                    }
+                    
+                    // JPEG nhanh hơn PNG 5-10 lần, chất lượng 95%
+                    const dataUrl = finalCanvas.toDataURL('image/jpeg', 0.95);
+                    renderedDrawingCache[fileBanVe] = dataUrl;
+                    
+                    const img = document.createElement('img');
+                    img.src = dataUrl;
+                    img.style.cssText = 'width:100%; height:100%; object-fit:contain;';
+                    page.appendChild(img);
+                } catch (err) {
+                    console.error('Lỗi render PDF:', err);
+                    page.innerHTML = '<p style="text-align:center; font-size:14px; color:#999;">Không tải được bản vẽ PDF</p>';
+                }
+            } else {
+                // Dùng img cho ảnh (jpg, png, ...)
+                const img = document.createElement('img');
+                img.src = fetchUrl;
+                img.style.cssText = 'max-width:100%; max-height:100vh; object-fit:contain;';
+                page.appendChild(img);
+                // Đợi ảnh tải xong
+                await new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = () => {
+                        page.innerHTML = '<p style="text-align:center; font-size:14px; color:#999;">Không tải được bản vẽ</p>';
+                        resolve();
+                    };
+                });
+            }
+            return page;
+        }
+
+        // In nhanh 1 phiếu theo order_kd - dữ liệu đã có sẵn trong cache
+        async function quickPrint(orderId) {
+            const loadingEl = document.getElementById('loadingIndicator');
+            loadingEl.style.display = 'block';
+            loadingEl.textContent = 'Đang chuẩn bị in nhanh...';
+
+            // Chờ dữ liệu nền (products, 3D quang, PSX) nạp xong
+            await Promise.all([productsReadyPromise, quang3DReadyPromise, psxReadyPromise]);
+
+            const printArea = document.getElementById('printArea');
+            printArea.innerHTML = '';
+            try {
+                const orderData = orderDataMap.get(orderId) || allOrderData.find(item => item.order_kd === orderId);
+                if (!orderData) {
+                    alert('Không tìm thấy dữ liệu cho order: ' + orderId);
+                    loadingEl.style.display = 'none';
+                    return;
+                }
+
+                // Dữ liệu đã được tải sẵn từ initPage, lấy trực tiếp từ cache
+                const productData = productCache[orderData.ten_chi_tiet] || null;
+                const formElement = createForm(orderData, productData);
+                printArea.appendChild(formElement);
+                const qrContainer = formElement.querySelector('.qr-code');
+                if (qrContainer) {
+                    new QRCode(qrContainer, { text: orderData.order_kd, width: 150, height: 150, correctLevel: QRCode.CorrectLevel.H });
+                }
+
+                // Thêm trang bản vẽ (mặt sau)
+                if (productData && productData.file_ban_ve) {
+                    const drawingPage = await createDrawingPage(productData.file_ban_ve);
+                    printArea.appendChild(drawingPage);
+                }
+
+                loadingEl.style.display = 'none';
+                // In ngay vì PDF đã được render xong
+                setTimeout(() => {
+                    window.print();
+                    // Đánh dấu đã in
+                    markAsPrinted([orderId]);
+                    setTimeout(() => { printArea.innerHTML = ''; }, 500);
+                }, 300);
+            } catch (error) {
+                console.error('Lỗi in nhanh:', error);
+                loadingEl.style.display = 'none';
+                alert('Lỗi in nhanh: ' + error.message);
+                printArea.innerHTML = '';
+            }
+        }
+
+        // Hàm kiểm tra ten_chi_tiet có trong bảng thoi_gian_do_ga_lap_3d_quang không
+        async function check3DQuang(tenChiTiet) {
+            if (quang3DCache.hasOwnProperty(tenChiTiet)) {
+                return quang3DCache[tenChiTiet];
+            }
+            try {
+                const response = await fetch(`https://${region}.appsheet.com/api/v2/apps/${appId}/tables/thoi_gian_do_ga_lap_3d_quang/Action`, {
+                    method: 'POST',
+                    headers: {
+                        'ApplicationAccessKey': accessKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Action: 'Find',
+                        Properties: {},
+                        Selector: `[ten_chi_tiet] = "${tenChiTiet}"`
+                    })
+                });
+                if (!response.ok) {
+                    quang3DCache[tenChiTiet] = null;
+                    return null;
+                }
+                const data = await response.json();
+                if (!Array.isArray(data) || data.length === 0) {
+                    quang3DCache[tenChiTiet] = null;
+                    return null;
+                }
+                // Kiểm tra khớp chính xác ten_chi_tiet (API có thể trả về kết quả không chính xác)
+                const exactMatch = data.find(item => item.ten_chi_tiet === tenChiTiet);
+                if (!exactMatch) {
+                    console.warn('3D Quang - Không khớp chính xác:', tenChiTiet,
+                        '| API trả về:', data.map(d => d.ten_chi_tiet));
+                    quang3DCache[tenChiTiet] = null;
+                    return null;
+                }
+                quang3DCache[tenChiTiet] = exactMatch;
+                return exactMatch;
+            } catch (error) {
+                console.error('3D Quang - Lỗi:', tenChiTiet, error);
+                quang3DCache[tenChiTiet] = null;
+                return null;
+            }
+        }
+
+        // Hàm lấy dữ liệu giao hàng PSX theo order_kd
+        async function fetchGiaoHangPSX(orderKd) {
+            if (giaoHangPSXCache.hasOwnProperty(orderKd)) {
+                return giaoHangPSXCache[orderKd];
+            }
+            try {
+                const response = await fetch(`https://${region}.appsheet.com/api/v2/apps/${appId}/tables/Giao_Hang_PSX/Action`, {
+                    method: 'POST',
+                    headers: {
+                        'ApplicationAccessKey': accessKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        Action: 'Find',
+                        Properties: {},
+                        Selector: `[order_kd] = "${orderKd}"`
+                    })
+                });
+                if (!response.ok) {
+                    giaoHangPSXCache[orderKd] = null;
+                    return null;
+                }
+                const data = await response.json();
+                if (!Array.isArray(data) || data.length === 0) {
+                    giaoHangPSXCache[orderKd] = null;
+                    return null;
+                }
+                // Lọc các bản ghi có dữ liệu xác nhận
+                const confirmed = data.filter(item =>
+                    item.order_kd === orderKd &&
+                    item.sl_da_xac_nhan_khi_giao_hang &&
+                    item.noi_dung_da_xac_nhan_khi_giao_hang
+                );
+                giaoHangPSXCache[orderKd] = confirmed.length > 0 ? confirmed : null;
+                return giaoHangPSXCache[orderKd];
+            } catch (error) {
+                console.error('Giao Hang PSX - Lỗi:', orderKd, error);
+                giaoHangPSXCache[orderKd] = null;
+                return null;
+            }
+        }
+
+        // In phiếu đã chọn - dữ liệu đã có sẵn trong cache
         async function printSelectedForms() {
             const selectedOrders = [];
             document.querySelectorAll('.row-checkbox:checked').forEach(checkbox => {
-                const orderId = checkbox.getAttribute('data-order');
-                selectedOrders.push(orderId);
+                selectedOrders.push(checkbox.getAttribute('data-order'));
             });
 
             if (selectedOrders.length === 0) {
@@ -1109,60 +1962,52 @@
                 return;
             }
 
-            // Hiển thị loading indicator
-            document.getElementById('loadingIndicator').style.display = 'block';
-            document.getElementById('loadingIndicator').textContent = 'Đang chuẩn bị in phiếu...';
+            const loadingEl = document.getElementById('loadingIndicator');
+            loadingEl.style.display = 'block';
+            loadingEl.textContent = 'Đang tạo phiếu in...';
 
-            // Xóa khu vực in trước khi thêm mới
+            // Chờ dữ liệu nền (products, 3D quang, PSX) nạp xong
+            await Promise.all([productsReadyPromise, quang3DReadyPromise, psxReadyPromise]);
+
             const printArea = document.getElementById('printArea');
             printArea.innerHTML = '';
 
             try {
-                // Kiểm tra xem dữ liệu sản phẩm đã được tải chưa
-                const tenChiTiets = selectedOrders.map(orderId => {
-                    const orderData = allOrderData.find(item => item.order_kd === orderId);
-                    return orderData ? orderData.ten_chi_tiet : null;
-                }).filter(Boolean); // Lọc bỏ các giá trị null
-
-                // Lấy các sản phẩm chưa được tải
-                const missingProducts = tenChiTiets.filter(tenChiTiet => !productCache[tenChiTiet]);
-
-                // Nếu còn sản phẩm chưa tải, tải thêm
-                if (missingProducts.length > 0) {
-                    document.getElementById('loadingIndicator').textContent =
-                        `Đang tải thông tin cho ${missingProducts.length} sản phẩm còn thiếu...`;
-
-                    // Tải từng sản phẩm còn thiếu
-                    for (const tenChiTiet of missingProducts) {
-                        const productData = await fetchProductData(tenChiTiet);
-                        if (productData && tenChiTiet) {
-                            productCache[tenChiTiet] = productData;
-                        }
+                // Bước 1: Chuẩn bị dữ liệu và tìm các PDF cần tải
+                const orderItems = [];
+                const pdfFilesToLoad = new Set();
+                
+                for (const orderId of selectedOrders) {
+                    const orderData = orderDataMap.get(orderId) || allOrderData.find(item => item.order_kd === orderId);
+                    if (!orderData) continue;
+                    const productData = productCache[orderData.ten_chi_tiet] || null;
+                    orderItems.push({ orderData, productData });
+                    if (productData && productData.file_ban_ve) {
+                        pdfFilesToLoad.add(productData.file_ban_ve);
                     }
                 }
 
-                // Tiếp tục xử lý in phiếu như trước
-                // Chuẩn bị tất cả các dữ liệu
-                const formData = selectedOrders.map(orderId => {
-                    const orderData = allOrderData.find(item => item.order_kd === orderId);
-                    if (!orderData || !orderData.ten_chi_tiet) {
-                        return [orderId, orderData, null];
-                    }
-                    return [orderId, orderData, productCache[orderData.ten_chi_tiet] || null];
-                });
+                // Bước 2: Tải TẤT CẢ PDF song song (không chờ từng cái)
+                const drawingCache = {};
+                if (pdfFilesToLoad.size > 0) {
+                    loadingEl.textContent = `Đang tải ${pdfFilesToLoad.size} bản vẽ...`;
+                    const pdfPromises = [...pdfFilesToLoad].map(async (fileBanVe) => {
+                        try {
+                            const drawingPage = await createDrawingPage(fileBanVe);
+                            drawingCache[fileBanVe] = drawingPage;
+                        } catch (e) {
+                            console.error('Lỗi tải bản vẽ:', fileBanVe, e);
+                        }
+                    });
+                    await Promise.all(pdfPromises);
+                }
 
-                // Tạo các phiếu từ dữ liệu đã có
-                for (const [orderId, orderData, productData] of formData) {
-                    if (!orderData) {
-                        console.error(`Không tìm thấy dữ liệu cho order: ${orderId}`);
-                        continue;
-                    }
-
-                    // Tạo phiếu và thêm vào khu vực in
+                // Bước 3: Ghép phiếu + bản vẽ vào printArea (rất nhanh vì đã cache)
+                loadingEl.textContent = 'Đang tạo phiếu in...';
+                for (const { orderData, productData } of orderItems) {
                     const formElement = createForm(orderData, productData);
                     printArea.appendChild(formElement);
 
-                    // Tạo mã QR cho phiếu này
                     const qrContainer = formElement.querySelector('.qr-code');
                     if (qrContainer) {
                         new QRCode(qrContainer, {
@@ -1172,25 +2017,32 @@
                             correctLevel: QRCode.CorrectLevel.H
                         });
                     }
+
+                    // Thêm trang bản vẽ đã cache
+                    if (productData && productData.file_ban_ve && drawingCache[productData.file_ban_ve]) {
+                        // Clone node vì cùng file có thể dùng cho nhiều phiếu
+                        const drawingClone = drawingCache[productData.file_ban_ve].cloneNode(true);
+                        printArea.appendChild(drawingClone);
+                    }
                 }
 
-                // Ẩn loading indicator
-                document.getElementById('loadingIndicator').style.display = 'none';
+                loadingEl.style.display = 'none';
 
-                // Thực hiện in và xóa nội dung printArea sau khi in xong
                 setTimeout(() => {
                     window.print();
+                    // Đánh dấu tất cả phiếu đã in
+                    markAsPrinted(selectedOrders);
                     setTimeout(() => {
-                        document.getElementById('printArea').innerHTML = '';
+                        printArea.innerHTML = '';
                     }, 500);
-                }, 500);
+                }, 300);
 
             } catch (error) {
                 console.error('Lỗi khi xử lý in phiếu:', error);
-                document.getElementById('loadingIndicator').style.display = 'none';
+                loadingEl.style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'block';
                 document.getElementById('errorMessage').textContent = 'Đã xảy ra lỗi khi in phiếu: ' + error.message;
-                document.getElementById('printArea').innerHTML = '';
+                printArea.innerHTML = '';
             }
         }
 
@@ -1229,12 +2081,7 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const text = await response.text();
-                if (!text || text.trim() === '') {
-                    return [];
-                }
-
-                const data = JSON.parse(text);
+                const data = await response.json();
                 return Array.isArray(data) ? data : [];
             } catch (error) {
                 console.error('Lỗi khi lấy dữ liệu sản phẩm:', error);
@@ -1242,34 +2089,108 @@
             }
         }
 
-        // Hàm khởi tạo trang - tải từng phần để tối ưu trải nghiệm người dùng
-        async function initPage() {
+        // Hàm lấy tất cả dữ liệu 3D quang
+        async function fetchAll3DQuang() {
             try {
-                document.getElementById('loadingIndicator').style.display = 'block';
-
-                // Bước 1: Tải dữ liệu đơn hàng trước
-                const orderData = await fetchBatchedOrders();
-                allOrderData = orderData;
-
-                // Bước 2: Tải dữ liệu sản phẩm để có sẵn cache
-                document.getElementById('loadingIndicator').textContent = 'Đang tải dữ liệu sản phẩm...';
-                const productData = await fetchAllProducts();
-
-                // Tạo cache sản phẩm
-                productData.forEach(product => {
-                    if (product.ten_chi_tiet) {
-                        productCache[product.ten_chi_tiet] = product;
-                    }
+                const response = await fetch(`https://${region}.appsheet.com/api/v2/apps/${appId}/tables/thoi_gian_do_ga_lap_3d_quang/Action`, {
+                    method: 'POST',
+                    headers: {
+                        'ApplicationAccessKey': accessKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "Action": "Find",
+                        "Properties": {
+                            "Locale": "vi-VN",
+                            "Timezone": "Asia/Ho_Chi_Minh"
+                        },
+                        "Rows": []
+                    })
                 });
 
-                // Bước 3: Hiển thị bảng sau khi đã có đầy đủ dữ liệu
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return Array.isArray(data) ? data : [];
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu 3D quang:', error);
+                return [];
+            }
+        }
+
+        // Hàm lấy tất cả dữ liệu giao hàng PSX
+        async function fetchAllGiaoHangPSX() {
+            try {
+                const response = await fetch(`https://${region}.appsheet.com/api/v2/apps/${appId}/tables/Giao_Hang_PSX/Action`, {
+                    method: 'POST',
+                    headers: {
+                        'ApplicationAccessKey': accessKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "Action": "Find",
+                        "Properties": {
+                            "Locale": "vi-VN",
+                            "Timezone": "Asia/Ho_Chi_Minh"
+                        },
+                        "Rows": []
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return Array.isArray(data) ? data : [];
+            } catch (error) {
+                console.error('Lỗi khi lấy dữ liệu giao hàng PSX:', error);
+                return [];
+            }
+        }
+
+        // Hàm khởi tạo trang - hiển thị bảng ngay khi có orders
+        async function initPage() {
+            const loadingEl = document.getElementById('loadingIndicator');
+            try {
+                loadingEl.style.display = 'block';
+                loadingEl.textContent = 'Đang tải dữ liệu...';
+
+                // Bắt đầu TẤT CẢ fetch cùng lúc (không chờ nhau)
+                const ordersPromise = fetchBatchedOrders();
+                const productsPromise = fetchAllProducts();
+                const quang3DPromise = fetchAll3DQuang();
+                const psxPromise = fetchAllGiaoHangPSX();
+                const printStatusPromise = loadPrintStatus();
+
+                // Chờ orders + print status — hiển thị bảng NGAY khi có
+                const orderData = await ordersPromise;
+                await printStatusPromise;
+                allOrderData = orderData;
+
+                // Lần đầu: nếu chưa khởi tạo, đánh dấu TẤT CẢ dữ liệu hiện tại là "Đã in"
+                if (!printStatusMap['__initialized']) {
+                    const allIds = orderData.map(item => item.order_kd).filter(Boolean);
+                    allIds.forEach(id => { printStatusMap[id] = true; });
+                    printStatusMap['__initialized'] = true;
+                    // Lưu lên server
+                    markAsPrinted([...allIds, '__initialized']);
+                }
+
+                // Tạo Map để lookup nhanh
+                orderDataMap = new Map();
+                for (let i = 0; i < orderData.length; i++) {
+                    orderDataMap.set(orderData[i].order_kd, orderData[i]);
+                }
+
+                // Hiển thị bảng NGAY — không chờ products, 3D, PSX
                 populateTable(allOrderData);
-                document.getElementById('loadingIndicator').style.display = 'none';
+                loadingEl.style.display = 'none';
 
-                // Thiết lập sự kiện cho nút in
+                // Thiết lập sự kiện
                 document.getElementById('printSelectedBtn').addEventListener('click', printSelectedForms);
-
-                // Thiết lập sự kiện cho checkbox "Chọn tất cả"
                 document.getElementById('selectAll').addEventListener('change', function () {
                     const isChecked = this.checked;
                     document.querySelectorAll('.row-checkbox').forEach(checkbox => {
@@ -1277,13 +2198,241 @@
                     });
                 });
 
-                console.log('Đã tải xong tất cả dữ liệu');
+                // Click vào dòng để tự động toggle checkbox
+                $('#dataTable tbody').on('click', 'tr', function (e) {
+                    // Bỏ qua nếu click vào checkbox, nút, hoặc link
+                    const target = e.target;
+                    if (target.tagName === 'INPUT' || target.tagName === 'BUTTON' || target.tagName === 'A' || target.closest('button') || target.closest('a')) {
+                        return;
+                    }
+                    const checkbox = this.querySelector('.row-checkbox');
+                    if (checkbox) {
+                        checkbox.checked = !checkbox.checked;
+                    }
+                });
+
+                console.log(`Bảng hiển thị: ${orderData.length} orders`);
+
+                // Các dữ liệu còn lại tải ngầm — khi nào xong thì cập nhật cache
+                productsReadyPromise = productsPromise.then(productData => {
+                    for (let i = 0; i < productData.length; i++) {
+                        if (productData[i].ten_chi_tiet) {
+                            productCache[productData[i].ten_chi_tiet] = productData[i];
+                        }
+                    }
+                    console.log(`Products cached: ${productData.length}`);
+                    // Cập nhật lại bảng để hiện link "In bản vẽ"
+                    if (dataTable) {
+                        dataTable.rows().invalidate().draw(false);
+                    }
+                }).catch(err => console.warn('Lỗi tải products:', err));
+
+                quang3DReadyPromise = quang3DPromise.then(quang3DData => {
+                    for (let i = 0; i < quang3DData.length; i++) {
+                        if (quang3DData[i].ten_chi_tiet) {
+                            quang3DCache[quang3DData[i].ten_chi_tiet] = quang3DData[i];
+                        }
+                    }
+                    console.log(`3D quang cached: ${quang3DData.length}`);
+                }).catch(err => console.warn('Lỗi tải 3D quang:', err));
+
+                psxReadyPromise = psxPromise.then(giaoHangPSXData => {
+                    for (let i = 0; i < giaoHangPSXData.length; i++) {
+                        const item = giaoHangPSXData[i];
+                        if (item.order_kd && item.sl_da_xac_nhan_khi_giao_hang && item.noi_dung_da_xac_nhan_khi_giao_hang) {
+                            if (!giaoHangPSXCache[item.order_kd]) {
+                                giaoHangPSXCache[item.order_kd] = [];
+                            }
+                            giaoHangPSXCache[item.order_kd].push(item);
+                        }
+                    }
+                    console.log(`PSX cached: ${giaoHangPSXData.length}`);
+                }).catch(err => console.warn('Lỗi tải PSX:', err));
+
             } catch (error) {
                 console.error('Lỗi khởi tạo trang:', error);
-                document.getElementById('loadingIndicator').style.display = 'none';
+                loadingEl.style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'block';
                 document.getElementById('errorMessage').textContent = 'Đã xảy ra lỗi: ' + error.message;
             }
+        }
+
+        // ===== TỰ ĐỘNG ĐIỀU CHỈNH (FLEXBOX - KHÔNG CẦN MARGIN) =====
+        function adjustTableContentMargin() {
+            // Flexbox layout tự xử lý, không cần tính toán margin
+        }
+
+        // Cập nhật khi thay đổi kích thước cửa sổ
+        window.addEventListener('resize', adjustTableContentMargin);
+
+        // ===== DI CHUYỂN LENGTH CONTROL =====
+        function moveLengthControl() {
+            // Tạo length control thủ công vì đã bỏ 'l' khỏi dom
+            const placeholder = document.getElementById('lengthControlPlaceholder');
+            if (!placeholder || !dataTable) return;
+
+            const lengthOptions = [10, 25, 50, 100, -1];
+            const lengthLabels = ['10', '25', '50', '100', 'Tất cả'];
+            const currentLength = dataTable.page.len();
+
+            let selectHTML = '<select id="customPageLength">';
+            for (let i = 0; i < lengthOptions.length; i++) {
+                const selected = lengthOptions[i] === currentLength ? ' selected' : '';
+                selectHTML += `<option value="${lengthOptions[i]}"${selected}>${lengthLabels[i]}</option>`;
+            }
+            selectHTML += '</select>';
+
+            placeholder.innerHTML = `<div class="dataTables_length"><label>Hiển thị ${selectHTML} dữ liệu</label></div>`;
+
+            // Gắn sự kiện thay đổi
+            document.getElementById('customPageLength').addEventListener('change', function () {
+                dataTable.page.len(parseInt(this.value)).draw();
+            });
+        }
+
+        // ===== MULTI-SEARCH FUNCTIONALITY =====
+        let activeSearchTerms = []; // Lưu các từ khóa đang tìm kiếm
+
+        function setupMultiSearch() {
+            const searchInput = document.getElementById('multiSearchInput');
+            const autoCheckBtn = document.getElementById('autoCheckBtn');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            const searchResultInfo = document.getElementById('searchResultInfo');
+
+            // Xử lý tìm kiếm khi nhập
+            searchInput.addEventListener('input', function () {
+                performMultiSearch(this.value);
+            });
+
+            // Xử lý khi nhấn Enter
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performMultiSearch(this.value);
+                    // Auto-check kết quả khi nhấn Enter
+                    autoCheckVisibleRows();
+                }
+            });
+
+            // Nút tích tất cả kết quả
+            autoCheckBtn.addEventListener('click', function () {
+                autoCheckVisibleRows();
+            });
+
+            // Nút xóa tìm kiếm
+            clearSearchBtn.addEventListener('click', function () {
+                searchInput.value = '';
+                activeSearchTerms = [];
+                searchResultInfo.textContent = '';
+
+                // Xóa custom filter
+                $.fn.dataTable.ext.search.length = 0;
+                dataTable.draw();
+
+                // Bỏ tích tất cả checkbox
+                document.querySelectorAll('.row-checkbox').forEach(cb => {
+                    cb.checked = false;
+                });
+                document.getElementById('selectAll').checked = false;
+
+                // Xóa highlight
+                document.querySelectorAll('#dataTable tbody tr').forEach(tr => {
+                    tr.classList.remove('search-highlight');
+                });
+            });
+        }
+
+        function performMultiSearch(searchValue) {
+            const searchResultInfo = document.getElementById('searchResultInfo');
+
+            // Tách các từ khóa bằng dấu phẩy, loại bỏ khoảng trắng thừa
+            activeSearchTerms = searchValue
+                .split(',')
+                .map(term => term.trim().toLowerCase())
+                .filter(term => term.length > 0);
+
+            // Xóa custom filter cũ
+            $.fn.dataTable.ext.search.length = 0;
+
+            if (activeSearchTerms.length === 0) {
+                searchResultInfo.textContent = '';
+                dataTable.draw();
+                return;
+            }
+
+            // Thêm custom filter mới - tìm theo OR (bất kỳ từ khóa nào khớp)
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                // data[4] là cột Order KD (index 4)
+                const orderKD = (data[4] || '').toLowerCase();
+                // data[5] là cột Tên chi tiết (index 5)
+                const tenChiTiet = (data[5] || '').toLowerCase();
+
+                // Kiểm tra xem bất kỳ từ khóa nào khớp với Order KD hoặc Tên chi tiết
+                return activeSearchTerms.some(term =>
+                    orderKD.includes(term) || tenChiTiet.includes(term)
+                );
+            });
+
+            dataTable.draw();
+
+            // Hiển thị số kết quả
+            const visibleCount = dataTable.rows({ filter: 'applied' }).count();
+            searchResultInfo.textContent = `Tìm thấy ${visibleCount} kết quả cho ${activeSearchTerms.length} từ khóa`;
+
+            // Highlight các dòng tìm được
+            highlightSearchResults();
+        }
+
+        function autoCheckVisibleRows() {
+            const searchResultInfo = document.getElementById('searchResultInfo');
+            let checkedCount = 0;
+
+            // Lấy tất cả các dòng đang hiển thị (sau khi lọc)
+            dataTable.rows({ filter: 'applied' }).every(function (rowIdx) {
+                const node = this.node();
+                if (node) {
+                    const checkbox = node.querySelector('.row-checkbox');
+                    if (checkbox && !checkbox.checked) {
+                        checkbox.checked = true;
+                        checkedCount++;
+                    }
+                }
+            });
+
+            // Cập nhật thông tin
+            const totalChecked = document.querySelectorAll('.row-checkbox:checked').length;
+            if (checkedCount > 0) {
+                searchResultInfo.textContent = `Đã tích ${checkedCount} mục mới. Tổng đã tích: ${totalChecked}`;
+
+                // Thông báo toast
+                if (typeof Toastify !== 'undefined') {
+                    Toastify({
+                        text: `✅ Đã tích ${checkedCount} checkbox (Tổng: ${totalChecked})`,
+                        duration: 2000,
+                        gravity: 'top',
+                        position: 'center',
+                        backgroundColor: 'linear-gradient(to right, #6e8efb, #a777e3)',
+                        stopOnFocus: true
+                    }).showToast();
+                }
+            } else {
+                searchResultInfo.textContent = `Tất cả kết quả đã được tích. Tổng: ${totalChecked}`;
+            }
+        }
+
+        function highlightSearchResults() {
+            // Xóa highlight cũ
+            document.querySelectorAll('#dataTable tbody tr').forEach(tr => {
+                tr.classList.remove('search-highlight');
+            });
+
+            // Thêm highlight cho các dòng visible
+            dataTable.rows({ filter: 'applied' }).every(function () {
+                const node = this.node();
+                if (node) {
+                    node.classList.add('search-highlight');
+                }
+            });
         }
 
         // Khởi chạy khi trang đã tải xong
